@@ -4,58 +4,109 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 </head>
 <body>
     <script>
-        const PROGRAMMING = "Programming";
-        const ART = "Art";
-        
-        const yamlFileBookA = 
-`name: "Clean Code: A Handbook of Agile Software Craftsmanship"
-types:
-- ${PROGRAMMING}
-`;
+        const input1 = `AT24C08C`; //EEPROM
+        const input2 = `AT89C52`; // MCU
+        const input3 = `STM32F103RBT6`;
 
-const yamlFileBookB = 
-`name: "Drawing Cartoons & Comics for Dummies"
-types:
-- ${ART}
-`;
+        // "AT", "??", "C", "??"
 
-const yamlFileBookC = 
-`name: "Processing 2: Creative Programming Cookbook: Over 90 highly-effective recipes to unleash your creativity"
-types:
-- ${PROGRAMMING}
-- ${ART}
-`;
-        const indexed = [ 
-            yamlFileBookA, 
-            yamlFileBookB,
-            yamlFileBookC
-        ].reduce((prev, current) => {
-            const currentBook = jsyaml.load(current);
-            const currentBookTypes = currentBook["types"];
+        // let isAtmelObj = {
+        //     is1thOK: false,
+        //     is2thOK: false,
+        //     func: function (e, i) {
+        //         this.is1thOK = i == 0 ? e == "A" : this.is1thOK;
+        //         this.is2thOK = this.is1thOK && i == 1 ? e == "T" : this.is2thOK; 
 
-            if (!Array.isArray(currentBookTypes)) {
-                return {};
-            }
+        //         if (this.is1thOK && this.is2thOK)
 
-            let updated = {...prev };
+        //     },
+        //     isAtmelFunc: function () {
+        //         return ;
+        //     }
+        // };
 
-            currentBookTypes.forEach(currentBookType => {
-                if (!updated[currentBookType]) {
-                    updated = {...updated, [currentBookType]: [ currentBook["name"] ]}
-                } else {
-                    updated = {...updated, [currentBookType]: [...updated[currentBookType], currentBook["name"] ]}
+        // input.split("").forEach((e, i) => {
+        //     isAtmelObj.func(e, i);
+        // })
+
+        // console.log(isAtmelObj.isAtmelFunc());
+
+        const AT = "AT";
+        const _24C = "24C";
+
+        var isAlpha = function(ch){
+            return typeof ch === "string" && ch.length === 1
+                && (ch >= "a" && ch <= "z" || ch >= "A" && ch <= "Z");
+        }
+
+        var AtmelProductDetector = function (input) {
+            var index = 0;
+            var isAtmel = false;
+            var productFamily = "";
+            var deviceDensity = NaN;
+            var deviceRevision = "";
+            //while (index < input.length)
+
+            isAtmel = input.slice(index, AT.length) == AT;
+            debugger;
+
+            index += AT.length;
+
+            if (isNaN(input.slice(index, index + 2))){ //"??" 
+                return
+            };
+            index += 2;
+
+            if (input.slice(index, index + "C".length) != "C") {
+                return
+            };
+
+            productFamily = input.slice(index - 2,  index + "C".length);
+
+            index += 1;
+            
+            if (isNaN(deviceDensity = Number(input.slice(index, index + 2)))){ //"??" 
+                deviceDensity = NaN;
+                return
+            };
+            debugger;
+            index += 2;
+
+            if (!isAlpha(deviceRevision = input.slice(index, index + "C".length))) {
+                deviceRevision = "";
+            };
+            index += 1;
+
+            debugger;
+
+            if (isAtmel) {
+                if (productFamily == "24C") {
+                    console.log(`${productFamily} is a Atmel EEPROM`)
+                } else if (productFamily == "89C") {
+                    console.log(`${productFamily}  is a Atmel MCU`)
                 }
-            });
+            }
+        };
 
-            return updated;
-        }, {});
+        var STMicroelectronicsProductDetector = function (input) {
+            const STM = "STM"
+            let isSTM = input.slice(0, STM.length) == STM;
+            if (isSTM) {
+                console.log(`is a STM device`)
+            }
+        }
         
-        console.table(indexed);
-        console.table(indexed[ART]);
+        debugger;
+
+
+        [input1, input2, input3].forEach(input => {
+            AtmelProductDetector(input);
+            STMicroelectronicsProductDetector(input);
+        });
+
     </script>
 </body>
 </html>
